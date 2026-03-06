@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Apk Nevers</title>
+    <style>
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background: #000;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #bg-video-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        #bg-video-container video {
+            min-width: 100%; min-height: 100%;
+            width: auto; height: auto;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            filter: brightness(0.5) saturate(1.2);
+        }
+        
+        .glass-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: -1;
+        }
+        
+        #entry-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .entry-icon {
+            width: 80px; height: 80px;
+            background: linear-gradient(45deg, #00dbde, #fc00ff);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 30px rgba(0, 219, 222, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 219, 222, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(0, 219, 222, 0.7); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 219, 222, 0.4); }
+        }
+
+        .main-content {
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; padding: 20px;
+            perspective: 1000px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 35px;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 35px 25px;
+            max-width: 400px; width: 100%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: iosIn 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes iosIn {
+            from { opacity: 0; transform: scale(0.8) translateY(30px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .video-box {
+            width: 100%; aspect-ratio: 16/9;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .video-box video { width: 100%; height: 100%; object-fit: cover; }
+
+        h1 {
+            font-size: 1.8rem; font-weight: 800; margin-bottom: 5px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #aaa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 11px; color: rgba(255,255,255,0.5);
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px;
+        }
+
+        .buttons-container { display: flex; flex-direction: column; gap: 12px; }
+
+        .btn {
+            padding: 16px; border-radius: 16px;
+            color: white; text-decoration: none; font-weight: 600;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 15px;
+        }
+
+        .btn:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.15); }
+
+        .btn-primary { border-bottom: 2px solid #00dbde; }
+        .btn-dev { border-bottom: 2px solid #fc00ff; }
+
+        h5 { margin-top: 15px; font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
+
+    </style>
+</head>
+<body>
+
+    <div id="bg-video-container">
+        <video id="main-bg-video" loop muted playsinline>
+            <source src="https://files.catbox.moe/acr35m.mp4" type="video/mp4" />
+        </video>
+    </div>
+    <div class="glass-overlay"></div>
+
+    <div id="entry-overlay" onclick="startApp()">
+        <div class="entry-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="white">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+        </div>
+        <span style="font-size: 12px; letter-spacing: 4px; font-weight: 600;">TAP TO ENTER</span>
+    </div>
+
+    <audio id="bg-audio" loop>
+        <source src="https://files.catbox.moe/w8kk3t.mp4" type="audio/mpeg" />
+    </audio>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="video-box">
+                <video id="profile-video" loop muted playsinline>
+                    <source src="https://files.catbox.moe/ehslkv.mp4" type="video/mp4" />
+                </video>
+            </div>
+            
+            <h1>BY XETA AXATA</h1>
+            <p class="subtitle">FIXED BY agaas C7bx4</p>
+
+            <div class="buttons-container">
+                <a href="https://ditzzzgamonnn123-create.github.io/Bt/" class="btn btn-primary">Beranda</a>
+                <a href="https://sociabuzz.com/agaas_reall" class="btn btn-dev">Developer</a>
+                <a href="https://ditzzzgamonnn123-create.github.io/Login-vip/" class="btn btn-primary">VIP ACCESS</a>
+                <h5>SERVER GLOBAL</h5>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('bg-audio');
+        const overlay = document.getElementById('entry-overlay');
+        const profileVideo = document.getElementById('profile-video');
+        const bgVideo = document.getElementById('main-bg-video');
+
+        function startApp() {
+            audio.play().catch(() => {});
+            profileVideo.play().catch(() => {});
+            bgVideo.play().catch(() => {});
+            
+            overlay.style.opacity = '0';
+            overlay.style.transform = 'scale(1.2)';
+            setTimeout(() => overlay.style.display = 'none', 1000);
+        }
+    </script>
+</body>
+</html>
